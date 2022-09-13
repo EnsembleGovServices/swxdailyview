@@ -1,18 +1,35 @@
-import json
+import os
 from collections import Counter
+
+from SWx_Dailly_View_Project.kp_forecast import utils
+
+ACCESS_KEY = os.getenv("ACCESS_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
 
 
 class GetTodayKpService:
 
     @staticmethod
     def kp_rate_today():
+
         # right now we are using this static file
-        f = open('converted_demo_kp_forecast_file.json')
-        convert_data = json.load(f)
-        f.close()
+
+        # below 3 lines for fetching by static file
+        # f = open('converted_demo_kp_forecast_file.json')
+        # convert_data = json.load(f)
+        # f.close()
+        # example for file name formate
+        # file_name = 'kp index/KP Forecast 2022.09.08 1702.json'
+
+        file_name = utils.fetch_last_modified_kp_forecast_file()
+        file_date = file_name.split()[3]
+        file_date = file_date.replace(".", "-")
+        formatted_data = utils.convert_into_json(file_name=file_name)
+
         kp_rates_output = []
-        for i in convert_data:
-            if i['time_tag'].split(" ", 1)[0] == '2022-08-28':
+        for i in formatted_data:
+            if i['time_tag'].split(" ", 1)[0] == file_date:
                 kp_rates_output.append(i['kp'])
         kp_rate_dict = dict(Counter(kp_rates_output))
         max_kp_occurrence = max(kp_rate_dict, key=kp_rate_dict.get)
@@ -81,13 +98,15 @@ class GetTodayKpService:
 
     @staticmethod
     def kp_rate_as_per_intervals():
-        f = open('converted_demo_kp_forecast_file.json')
-        convert_data = json.load(f)
-        f.close()
+
+        file_name = utils.fetch_last_modified_kp_forecast_file()
+        file_date = file_name.split()[3]
+        file_date = file_date.replace(".", "-")
+        formatted_data = utils.convert_into_json(file_name=file_name)
 
         kp_rate_as_per_intervals_list = []
-        for i in convert_data:
-            if i['time_tag'].split(" ", 1)[0] == '2022-08-28':
+        for i in formatted_data:
+            if i['time_tag'].split(" ", 1)[0] == file_date:
                 kp_rate_as_per_intervals_list.append(GetTodayKpService.time_interval_kp_rate(i))
 
         return kp_rate_as_per_intervals_list
@@ -95,18 +114,25 @@ class GetTodayKpService:
     @staticmethod
     def predicted_kp_index(desired_date):
 
-        # for fetching data from the file we need to load that
-        f = open('converted_demo_kp_forecast_file.json')
-        convert_data = json.load(f)
-        f.close()
+        # file_name = 'kp index/KP Forecast 2022.09.08 1702.json'
+        # formatted_data = convert_into_json(file_name=file_name)
+
+        # f = open('converted_demo_kp_forecast_file.json')
+        # convert_data = json.load(f)
+        # f.close()
+
+        file_name = utils.fetch_last_modified_kp_forecast_file()
+        file_date = file_name.split()[3]
+        file_date = file_date.replace(".", "-")
+        formatted_data = utils.convert_into_json(file_name=file_name)
 
         predicted_data = []
-        for data in convert_data:
+        for data in formatted_data:
             if data['observed'] == 'predicted':
                 predicted_data.append(data)
 
         from datetime import datetime
-        date_time_str = desired_date
+        date_time_str = file_date + ' 00:00:00'
         date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
 
         import datetime
@@ -117,7 +143,6 @@ class GetTodayKpService:
         next_three_dates = [str(next_one_day).split(" ", 1)[0],
                             str(next_sec_day).split(" ", 1)[0],
                             str(next_third_day).split(" ", 1)[0]]
-
         predicted_next_three_days_kp = []
         for observed_predicted_dates in predicted_data:
             if observed_predicted_dates['time_tag'].split(" ", 1)[0] in next_three_dates:
