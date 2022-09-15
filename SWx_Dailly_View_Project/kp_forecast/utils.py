@@ -55,7 +55,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 BUCKET_NAME = os.getenv("BUCKET_NAME")
 
 data_fetcher = FetchFileData(ACCESS_KEY, SECRET_KEY)
-result = data_fetcher.fetch_response(BUCKET_NAME, file_name='kp index/KP Forecast 2022.09.08 1702.json')
+# result = data_fetcher.fetch_response(BUCKET_NAME, file_name='kp index/KP Forecast 2022.09.08 1702.json')
 
 
 # print("So this is proton_flux: ", proton_flux)
