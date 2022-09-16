@@ -7,4 +7,4 @@ proton_flux_blueprint = Blueprint('proton_flux_blueprint', __name__)
 proton_flux_api = Api(proton_flux_blueprint)
 
 
-proton_flux_api.add_resource(resources.GetProtonFluxResource,'/get-proton-flux-data/')
+proton_flux_api.add_resource(resources.GetProtonFluxResource,'/get-proton-flux-data')

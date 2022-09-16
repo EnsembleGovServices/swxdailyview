@@ -1,35 +1,28 @@
-import os
+from datetime import timedelta, datetime
+
 import pandas as pd
-import boto3
 from io import StringIO
 
-from dotenv import load_dotenv
 
-load_dotenv()
-
-ACCESS_KEY = os.getenv("ACCESS_KEY")
-SECRET_KEY = os.getenv("SECRET_KEY")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
+from SWx_Dailly_View_Project.goes_proton_flux import utils
+from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME
 
 
 class GetProtonFluxService:
 
     @staticmethod
-    def proton_flux_data(args):
+    def proton_flux_data(request):
 
-        # print("this is args: ",args.get("days"))
+        s3_client = get_s3_client()
 
-        s3_client = boto3.client(
-            "s3",
-            aws_access_key_id=ACCESS_KEY,
-            aws_secret_access_key=SECRET_KEY)
-
-        file_name = 'proton flux/Proton Flux 2022.09.08 2150.csv'
+        # fetch particular file from the bucket
+        # file_name = 'proton flux/Proton Flux 2022.09.15 1200.csv' [ for sample file name ]
+        file_name = utils.fetch_last_modified_proton_flux_file()
         response = s3_client.get_object(Bucket=BUCKET_NAME, Key=file_name)
         raw_data = response.get('Body')
         data = raw_data.read().decode('UTF-8')
+
         file_date = file_name.split()[3]
-        from datetime import datetime
         date_time_str = file_date + ' 00:00:00'
         date_time_str = date_time_str.replace(".", "-")
         date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
@@ -37,18 +30,33 @@ class GetProtonFluxService:
         date_list = date_obj[0].split("-")
         desired_date_list = [date_list[1], date_list[2], date_list[0]]
         desired_date = ""
+
         for i in range(len(desired_date_list)):
             if i != 0:
                 desired_date += "/"
             desired_date += desired_date_list[i]
 
-        # print("this is new date: ", desired_date)
         csv_data = pd.read_csv(StringIO(data))
-        # duration = '1 Day'
-        if args.get("days")==1:
+        if request.args.get('days') == "1":
             drop_lis = []
             for i in range(len(csv_data)):
                 if csv_data.iloc[i]['time_tag'].split()[0] != desired_date:
+                    drop_lis.append(i)
+            csv_data.drop(drop_lis, axis=0, inplace=True)
+
+        if request.args.get("Hours") == "6":
+            str_date = desired_date + " 15:00:00"
+            current_date = datetime.strptime(str_date, '%m/%d/%Y %H:%M:%S')
+            desired_time_lis = [str(current_date)[:13]]
+            for i in range(5):
+                current_date = current_date - timedelta(hours=1)
+                desired_time_lis.append(str(current_date)[:13])
+
+            for index, item in enumerate(desired_time_lis):
+                desired_time_lis[index] = item.replace('-', '/')
+            drop_lis = []
+            for i in range(len(csv_data)):
+                if (str(datetime.strptime(str(csv_data.iloc[i]['time_tag'][:13]), '%m/%d/%Y %H'))[:13]).replace('-', '/') not in desired_time_lis:
                     drop_lis.append(i)
             csv_data.drop(drop_lis, axis=0, inplace=True)
 

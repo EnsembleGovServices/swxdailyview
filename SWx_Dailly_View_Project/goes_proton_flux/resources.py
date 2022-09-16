@@ -9,5 +9,4 @@ class GetProtonFluxResource(Resource):
 
     @classmethod
     def get(cls):
-        args = request.args
-        return cls.service_obj.proton_flux_data(args)
+        return cls.service_obj.proton_flux_data(request)
