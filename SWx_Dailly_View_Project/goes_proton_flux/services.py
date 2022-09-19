@@ -3,7 +3,6 @@ from datetime import timedelta, datetime
 import pandas as pd
 from io import StringIO
 
-
 from SWx_Dailly_View_Project.goes_proton_flux import utils
 from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME
 
@@ -44,6 +43,36 @@ class GetProtonFluxService:
                     drop_lis.append(i)
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
+        # for 3 days
+        if request.args.get('days') == '3':
+            desired_three_dates = [desired_date]
+            date_time_str = desired_date + ' 00:00:00'
+
+            current_date_formate = datetime.strptime(date_time_str, '%m/%d/%Y %H:%M:%S')
+
+            last_one_day = current_date_formate - timedelta(days=1)
+            last_sec_day = current_date_formate - timedelta(days=2)
+
+            last_two_days = [str(last_one_day).split(" ", 1)[0].replace("-", "/"),
+                             str(last_sec_day).split(" ", 1)[0].replace("-", "/")]
+
+            for date in last_two_days:
+                lis = date.split("/")
+                new_date = [lis[1], lis[2], lis[0]]
+                format_date = ""
+                for i in range(len(new_date)):
+                    if i != 0:
+                        format_date += "/"
+                    format_date += new_date[i]
+                desired_three_dates.append(format_date)
+
+            drop_lis = []
+            for i in range(len(csv_data)):
+                if csv_data.iloc[i]['time_tag'].split()[0] not in desired_three_dates:
+                    drop_lis.append(i)
+            csv_data.drop(drop_lis, axis=0, inplace=True)
+            print("this is csv data", csv_data)
+
         if request.args.get("Hours") == "6":
             str_date = desired_date + " 15:00:00"
             current_date = datetime.strptime(str_date, '%m/%d/%Y %H:%M:%S')
@@ -54,9 +83,11 @@ class GetProtonFluxService:
 
             for index, item in enumerate(desired_time_lis):
                 desired_time_lis[index] = item.replace('-', '/')
+
             drop_lis = []
             for i in range(len(csv_data)):
-                if (str(datetime.strptime(str(csv_data.iloc[i]['time_tag'][:13]), '%m/%d/%Y %H'))[:13]).replace('-', '/') not in desired_time_lis:
+                if (str(datetime.strptime(str(csv_data.iloc[i]['time_tag'][:13]), '%m/%d/%Y %H'))[:13]).replace('-',
+                                                                                                                '/') not in desired_time_lis:
                     drop_lis.append(i)
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
