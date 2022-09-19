@@ -4,6 +4,8 @@ import os
 import boto3
 from dotenv import load_dotenv
 
+from SWx_Dailly_View_Project.kp_forecast import constants
+
 load_dotenv()
 
 ACCESS_KEY = os.getenv("ACCESS_KEY")
@@ -77,14 +79,20 @@ def convert_into_json(file_name):
 
 
 def fetch_last_modified_kp_forecast_file():
-    conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY,aws_secret_access_key=SECRET_KEY)
+    conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
     s3 = conn.resource('s3')
     bucket_data = s3.Bucket(BUCKET_NAME)
-    lis = []
-    for x in bucket_data.objects.filter(Prefix='kp index/'):
-        lis.append(x.last_modified)
+    lis = [x.last_modified for x in bucket_data.objects.filter(Prefix='kp index/')]
     for x in bucket_data.objects.filter(Prefix='kp index/'):
         if x.last_modified == lis[-1]:
             latest_file = x.key
-
     return latest_file
+
+
+def formatted_data_fetch():
+    file_name = fetch_last_modified_kp_forecast_file()
+    file_date = file_name.split()[3]
+    file_date = file_date.replace(".", "-")
+    formatted_data = convert_into_json(file_name=file_name)
+
+    return file_date, formatted_data

@@ -43,7 +43,7 @@ class GetProtonFluxService:
                     drop_lis.append(i)
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
-        # for 3 days
+        # for 3 days request
         if request.args.get('days') == '3':
             desired_three_dates = [desired_date]
             date_time_str = desired_date + ' 00:00:00'

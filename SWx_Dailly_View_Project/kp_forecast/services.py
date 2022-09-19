@@ -1,7 +1,9 @@
 import os
 from collections import Counter
 
-from SWx_Dailly_View_Project.kp_forecast import utils
+from datetime import datetime, timedelta
+
+from SWx_Dailly_View_Project.kp_forecast.utils import formatted_data_fetch
 
 ACCESS_KEY = os.getenv("ACCESS_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -12,16 +14,8 @@ class GetTodayKpService:
 
     @staticmethod
     def kp_rate_today():
-
-        file_name = utils.fetch_last_modified_kp_forecast_file()
-        file_date = file_name.split()[3]
-        file_date = file_date.replace(".", "-")
-        formatted_data = utils.convert_into_json(file_name=file_name)
-
-        kp_rates_output = []
-        for i in formatted_data:
-            if i['time_tag'].split(" ", 1)[0] == file_date:
-                kp_rates_output.append(i['kp'])
+        file_date, formatted_data = formatted_data_fetch()
+        kp_rates_output = [data['kp'] for data in formatted_data if data['time_tag'].split(" ", 1)[0] == file_date]
         kp_rate_dict = dict(Counter(kp_rates_output))
         max_kp_occurrence = max(kp_rate_dict, key=kp_rate_dict.get)
         return max_kp_occurrence
@@ -89,40 +83,27 @@ class GetTodayKpService:
 
     @staticmethod
     def kp_rate_as_per_intervals():
+        file_date, formatted_data = formatted_data_fetch()
 
-        file_name = utils.fetch_last_modified_kp_forecast_file()
-        file_date = file_name.split()[3]
-        file_date = file_date.replace(".", "-")
-        formatted_data = utils.convert_into_json(file_name=file_name)
-
-        kp_rate_as_per_intervals_list = []
-        for i in formatted_data:
-            if i['time_tag'].split(" ", 1)[0] == file_date:
-                kp_rate_as_per_intervals_list.append(GetTodayKpService.time_interval_kp_rate(i))
+        kp_rate_as_per_intervals_list = [
+            GetTodayKpService.time_interval_kp_rate(i) for i in formatted_data
+            if i['time_tag'].split(" ", 1)[0] == file_date
+        ]
 
         return kp_rate_as_per_intervals_list
 
     @staticmethod
     def predicted_kp_index():
 
-        file_name = utils.fetch_last_modified_kp_forecast_file()
-        file_date = file_name.split()[3]
-        file_date = file_date.replace(".", "-")
-        formatted_data = utils.convert_into_json(file_name=file_name)
+        file_date, formatted_data = formatted_data_fetch()
 
-        predicted_data = []
-        for data in formatted_data:
-            if data['observed'] == 'predicted':
-                predicted_data.append(data)
+        predicted_data = [data for data in formatted_data if data['observed'] == 'predicted']
 
-        from datetime import datetime
-        date_time_str = file_date + ' 00:00:00'
-        date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+        date_time_obj = datetime.strptime(file_date + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
 
-        import datetime
-        next_one_day = date_time_obj + datetime.timedelta(days=1)
-        next_sec_day = date_time_obj + datetime.timedelta(days=2)
-        next_third_day = date_time_obj + datetime.timedelta(days=3)
+        next_one_day = date_time_obj + timedelta(days=1)
+        next_sec_day = date_time_obj + timedelta(days=2)
+        next_third_day = date_time_obj + timedelta(days=3)
 
         next_three_dates = [str(next_one_day).split(" ", 1)[0],
                             str(next_sec_day).split(" ", 1)[0],

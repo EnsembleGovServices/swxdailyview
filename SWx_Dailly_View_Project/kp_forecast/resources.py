@@ -29,5 +29,5 @@ class GetHighestKpInNextThreeDays(Resource):
     service_obj = services.GetTodayKpService()
 
     @classmethod
-    def get(cls, desired_date):
-        return cls.service_obj.predicted_kp_index(desired_date)
+    def get(cls):
+        return cls.service_obj.predicted_kp_index()
