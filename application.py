@@ -1,6 +1,10 @@
 import os
 
+from dotenv import load_dotenv
+
 from SWx_Dailly_View_Project import create_app
+
+load_dotenv()
 
 env_name = os.getenv('FLASK_ENV')
 

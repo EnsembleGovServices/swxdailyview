@@ -3,6 +3,12 @@ from flask_restful import Resource
 from SWx_Dailly_View_Project.kp_forecast import services
 
 
+class Root(Resource):
+    @classmethod
+    def get(cls):
+        return {'status': 'OK'}
+
+
 class GetKpData(Resource):
     service_obj = services.GetTodayKpService()
 

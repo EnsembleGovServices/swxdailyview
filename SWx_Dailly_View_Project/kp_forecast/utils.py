@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+ACCESS_KEY = os.getenv("ACCESS_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+
 
 class FetchFileData:
     """
@@ -50,15 +54,7 @@ class FetchFileData:
         return formatted_data
 
 
-ACCESS_KEY = os.getenv("ACCESS_KEY")
-SECRET_KEY = os.getenv("SECRET_KEY")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
-
 data_fetcher = FetchFileData(ACCESS_KEY, SECRET_KEY)
-# result = data_fetcher.fetch_response(BUCKET_NAME, file_name='kp index/KP Forecast 2022.09.08 1702.json')
-
-
-# print("So this is proton_flux: ", proton_flux)
 
 
 # the second way to convert json data into dictionary file formate:
@@ -80,19 +76,15 @@ def convert_into_json(file_name):
     return formatted_data
 
 
-# converted_dic = convert_into_json(file_name='kp index/KP Forecast 2022.09.08 1702.json')
-
 def fetch_last_modified_kp_forecast_file():
-    bucket_name = "swxdailyview"
     conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY,aws_secret_access_key=SECRET_KEY)
     s3 = conn.resource('s3')
-    bucket_data = s3.Bucket(bucket_name)
+    bucket_data = s3.Bucket(BUCKET_NAME)
     lis = []
     for x in bucket_data.objects.filter(Prefix='kp index/'):
         lis.append(x.last_modified)
     for x in bucket_data.objects.filter(Prefix='kp index/'):
         if x.last_modified == lis[-1]:
             latest_file = x.key
-            # print("yayy",type(latest_file))
 
     return latest_file

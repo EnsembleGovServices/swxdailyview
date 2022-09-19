@@ -71,7 +71,6 @@ class GetProtonFluxService:
                 if csv_data.iloc[i]['time_tag'].split()[0] not in desired_three_dates:
                     drop_lis.append(i)
             csv_data.drop(drop_lis, axis=0, inplace=True)
-            print("this is csv data", csv_data)
 
         if request.args.get("Hours") == "6":
             str_date = desired_date + " 15:00:00"

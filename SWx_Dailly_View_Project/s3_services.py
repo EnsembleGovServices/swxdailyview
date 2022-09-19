@@ -11,6 +11,9 @@ BUCKET_NAME = os.getenv("BUCKET_NAME")
 
 
 def get_s3_client():
+    """
+        Creates the s3 buckets client
+    """
 
     s3_client = boto3.client(
         "s3",
