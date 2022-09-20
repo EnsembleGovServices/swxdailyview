@@ -37,10 +37,8 @@ class GetProtonFluxService:
 
         csv_data = pd.read_csv(StringIO(data))
         if request.args.get('days') == "1":
-            drop_lis = []
-            for i in range(len(csv_data)):
-                if csv_data.iloc[i]['time_tag'].split()[0] != desired_date:
-                    drop_lis.append(i)
+            drop_lis = [i for i in range(len(csv_data)) if csv_data.iloc[i]['time_tag'].split()[0] != desired_date]
+
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
         # for 3 days request
@@ -66,28 +64,23 @@ class GetProtonFluxService:
                     format_date += new_date[i]
                 desired_three_dates.append(format_date)
 
-            drop_lis = []
-            for i in range(len(csv_data)):
-                if csv_data.iloc[i]['time_tag'].split()[0] not in desired_three_dates:
-                    drop_lis.append(i)
+            drop_lis = [i for i in range(len(csv_data)) if csv_data.iloc[i]['time_tag'].split()[0] not in desired_three_dates]
+
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
         if request.args.get("Hours") == "6":
             str_date = desired_date + " 15:00:00"
             current_date = datetime.strptime(str_date, '%m/%d/%Y %H:%M:%S')
             desired_time_lis = [str(current_date)[:13]]
-            for i in range(5):
+            for _ in range(5):
                 current_date = current_date - timedelta(hours=1)
                 desired_time_lis.append(str(current_date)[:13])
 
             for index, item in enumerate(desired_time_lis):
                 desired_time_lis[index] = item.replace('-', '/')
 
-            drop_lis = []
-            for i in range(len(csv_data)):
-                if (str(datetime.strptime(str(csv_data.iloc[i]['time_tag'][:13]), '%m/%d/%Y %H'))[:13]).replace('-',
-                                                                                                                '/') not in desired_time_lis:
-                    drop_lis.append(i)
+            drop_lis = [i for i in range(len(csv_data)) if (str(datetime.strptime(str(csv_data.iloc[i]['time_tag'][:13]), '%m/%d/%Y %H'))[:13]).replace('-', '/') not in desired_time_lis]
+
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
         proton_flux = {

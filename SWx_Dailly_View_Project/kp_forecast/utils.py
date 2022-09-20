@@ -4,7 +4,7 @@ import os
 import boto3
 from dotenv import load_dotenv
 
-from SWx_Dailly_View_Project.kp_forecast import constants
+from SWx_Dailly_View_Project.constants import KP_INDEX_FOLDER_NAME
 
 load_dotenv()
 
@@ -48,12 +48,8 @@ class FetchFileData:
         top_row = response_data[0]
         total_column = len(top_row)
 
-        formatted_data = []
-        for response_row in response_data[1:]:
-            formatted_data.append({top_row[col_index]: response_row[col_index]
-                                   for col_index in range(total_column)})
-
-        return formatted_data
+        return [{top_row[col_index]: response_row[col_index] for col_index in range(total_column)} for response_row in
+                response_data[1:]]
 
 
 data_fetcher = FetchFileData(ACCESS_KEY, SECRET_KEY)
@@ -70,20 +66,16 @@ def convert_into_json(file_name):
     top_row = json_content[0]
     total_column = len(top_row)
 
-    formatted_data = []
-    for response_row in json_content[1:]:
-        formatted_data.append({top_row[col_index]: response_row[col_index]
-                               for col_index in range(total_column)})
-
-    return formatted_data
+    return [{top_row[col_index]: response_row[col_index] for col_index in range(total_column)} for response_row in
+            json_content[1:]]
 
 
 def fetch_last_modified_kp_forecast_file():
     conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
     s3 = conn.resource('s3')
     bucket_data = s3.Bucket(BUCKET_NAME)
-    lis = [x.last_modified for x in bucket_data.objects.filter(Prefix='kp index/')]
-    for x in bucket_data.objects.filter(Prefix='kp index/'):
+    lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME)]
+    for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME):
         if x.last_modified == lis[-1]:
             latest_file = x.key
     return latest_file
