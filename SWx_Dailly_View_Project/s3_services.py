@@ -19,8 +19,7 @@ def get_s3_client():
 
 
 def fetch_bucket_data():
-    bucket_name = BUCKET_NAME
     conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
     s3 = conn.resource('s3')
-    return s3.Bucket(bucket_name)
+    return s3.Bucket(BUCKET_NAME)
 

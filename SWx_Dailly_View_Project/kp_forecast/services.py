@@ -12,7 +12,23 @@ class GetTodayKpService:
         file_date, formatted_data = formatted_data_fetch()
         kp_rates_output = [data['kp'] for data in formatted_data if data['time_tag'].split(" ", 1)[0] == file_date]
         kp_rate_dict = dict(Counter(kp_rates_output))
-        return max(kp_rate_dict, key=kp_rate_dict.get)
+        response = {'kp_index': max(kp_rate_dict, key=kp_rate_dict.get)}
+        kp_index = int(response['kp_index'])
+        if kp_index >= 5:
+            if kp_index == 5:
+                response['noaa_scale'] = 'G1'
+            elif kp_index == 6:
+                response['noaa_scale'] = 'G2'
+            elif kp_index == 7:
+                response['noaa_scale'] = 'G3'
+            elif kp_index == 8:
+                response['noaa_scale'] = 'G4'
+            elif kp_index == 9:
+                response['noaa_scale'] = 'G5'
+        else:
+            response['noaa_scale'] = 'null'
+
+        return response
 
     @staticmethod
     def time_interval_kp_rate(rate):
