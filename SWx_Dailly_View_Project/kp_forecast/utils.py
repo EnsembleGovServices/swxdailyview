@@ -57,34 +57,43 @@ data_fetcher = FetchFileData(ACCESS_KEY, SECRET_KEY)
 
 # the second way to convert json data into dictionary file formate:
 def convert_into_json(file_name):
-    s3 = boto3.resource('s3', aws_access_key_id=ACCESS_KEY,
-                        aws_secret_access_key=SECRET_KEY)
+    try:
+        s3 = boto3.resource('s3', aws_access_key_id=ACCESS_KEY,
+                            aws_secret_access_key=SECRET_KEY)
 
-    content_object = s3.Object(BUCKET_NAME, file_name)
-    file_content = content_object.get()['Body'].read().decode('utf-8')
-    json_content = json.loads(file_content)
-    top_row = json_content[0]
-    total_column = len(top_row)
+        content_object = s3.Object(BUCKET_NAME, file_name)
+        file_content = content_object.get()['Body'].read().decode('utf-8')
+        json_content = json.loads(file_content)
+        top_row = json_content[0]
+        total_column = len(top_row)
 
-    return [{top_row[col_index]: response_row[col_index] for col_index in range(total_column)} for response_row in
-            json_content[1:]]
+        return [{top_row[col_index]: response_row[col_index] for col_index in range(total_column)} for response_row in
+                json_content[1:]]
+    except ValueError as e:
+        return f"There is some issue in desired file fetching: {e}"
 
 
 def fetch_last_modified_kp_forecast_file():
-    conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
-    s3 = conn.resource('s3')
-    bucket_data = s3.Bucket(BUCKET_NAME)
-    lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME)]
-    for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME):
-        if x.last_modified == lis[-1]:
-            latest_file = x.key
-    return latest_file
+    try:
+        conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
+        s3 = conn.resource('s3')
+        bucket_data = s3.Bucket(BUCKET_NAME)
+        lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME)]
+        for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME):
+            if x.last_modified == lis[-1]:
+                latest_file = x.key
+        return latest_file
+    except ValueError as e:
+        return f"There is some issue in desired file fetching: {e}"
 
 
 def formatted_data_fetch():
-    file_name = fetch_last_modified_kp_forecast_file()
-    file_date = file_name.split()[3]
-    file_date = file_date.replace(".", "-")
-    formatted_data = convert_into_json(file_name=file_name)
+    try:
+        file_name = fetch_last_modified_kp_forecast_file()
+        file_date = file_name.split()[3]
+        file_date = file_date.replace(".", "-")
+        formatted_data = convert_into_json(file_name=file_name)
 
-    return file_date, formatted_data
+        return file_date, formatted_data
+    except ValueError as e:
+        return f"There is some issue in desired file fetching: {e}"

@@ -9,25 +9,24 @@ bucket_data = fetch_bucket_data()
 
 
 def fetch_last_modified_mid_latitude_file():
-    lis = []
-    for x in bucket_data.objects.filter(Prefix=MID_LATITUDE_FOLDER_NAME):
-        lis.append(x.last_modified)
-    for x in bucket_data.objects.filter(Prefix=MID_LATITUDE_FOLDER_NAME):
-        if x.last_modified == lis[-1]:
-            latest_file = x.key
+    try:
+        lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=MID_LATITUDE_FOLDER_NAME)]
 
-    return latest_file
+        for x in bucket_data.objects.filter(Prefix=MID_LATITUDE_FOLDER_NAME):
+            if x.last_modified == lis[-1]:
+                return x.key
+    except ValueError as e:
+        return f"There is something wrong with file fetching {e}"
 
 
 def fetch_last_modified_high_latitude_file():
-    lis = []
-    for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME):
-        lis.append(x.last_modified)
-    for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME):
-        if x.last_modified == lis[-1]:
-            latest_file = x.key
-
-    return latest_file
+    try:
+        lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME)]
+        for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME):
+            if x.last_modified == lis[-1]:
+                return x.key
+    except ValueError as e:
+        return f"There is something wrong with file fetching {e}"
 
 
 def get_csv_data(file_name):
