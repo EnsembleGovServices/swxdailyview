@@ -26,7 +26,7 @@ class GetTodayKpService:
             elif kp_index == 9:
                 response['noaa_scale'] = 'G5'
         else:
-            response['noaa_scale'] = ''
+            response['noaa_scale'] = None
 
         return response
 
