@@ -1,14 +1,20 @@
 from collections import Counter
 
 from datetime import datetime, timedelta
+from http import HTTPStatus
 
+from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED
 from SWx_Dailly_View_Project.kp_forecast.utils import formatted_data_fetch
+from SWx_Dailly_View_Project.languages import Response
 
 
 class GetTodayKpService:
 
     @staticmethod
     def kp_rate_today():
+        if not formatted_data_fetch():
+            return Response(status_code=HTTPStatus.BAD_REQUEST,
+                            message=FILE_NOT_FETCHED).send_error_response()
         file_date, formatted_data = formatted_data_fetch()
         kp_rates_output = [data['kp'] for data in formatted_data if data['time_tag'].split(" ", 1)[0] == file_date]
         kp_rate_dict = dict(Counter(kp_rates_output))
@@ -93,6 +99,11 @@ class GetTodayKpService:
 
     @staticmethod
     def kp_rate_as_per_intervals():
+
+        if not formatted_data_fetch():
+            return Response(status_code=HTTPStatus.BAD_REQUEST,
+                            message=FILE_NOT_FETCHED).send_error_response()
+
         file_date, formatted_data = formatted_data_fetch()
 
         return [GetTodayKpService.time_interval_kp_rate(i) for i in formatted_data if
@@ -100,6 +111,9 @@ class GetTodayKpService:
 
     @staticmethod
     def predicted_kp_index():
+        if not formatted_data_fetch():
+            return Response(status_code=HTTPStatus.BAD_REQUEST,
+                            message=FILE_NOT_FETCHED).send_error_response()
 
         file_date, formatted_data = formatted_data_fetch()
 

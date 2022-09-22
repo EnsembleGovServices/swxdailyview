@@ -3,6 +3,7 @@ import os
 
 import boto3
 from dotenv import load_dotenv
+from flask import current_app
 
 from SWx_Dailly_View_Project.constants import KP_INDEX_FOLDER_NAME
 
@@ -66,11 +67,11 @@ def convert_into_json(file_name):
         json_content = json.loads(file_content)
         top_row = json_content[0]
         total_column = len(top_row)
-
         return [{top_row[col_index]: response_row[col_index] for col_index in range(total_column)} for response_row in
                 json_content[1:]]
-    except ValueError as e:
-        return f"There is some issue in desired file fetching: {e}"
+    except Exception as e:
+        current_app.logger.error(f"Error detected: {e}")
+        return None
 
 
 def fetch_last_modified_kp_forecast_file():
@@ -78,22 +79,27 @@ def fetch_last_modified_kp_forecast_file():
         conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
         s3 = conn.resource('s3')
         bucket_data = s3.Bucket(BUCKET_NAME)
+        latest_file = None
         lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME)]
         for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME):
             if x.last_modified == lis[-1]:
                 latest_file = x.key
         return latest_file
-    except ValueError as e:
-        return f"There is some issue in desired file fetching: {e}"
+    except Exception as e:
+        current_app.logger.error(f"Error detected: {e}")
+        return None
 
 
 def formatted_data_fetch():
-    try:
-        file_name = fetch_last_modified_kp_forecast_file()
-        file_date = file_name.split()[3]
-        file_date = file_date.replace(".", "-")
-        formatted_data = convert_into_json(file_name=file_name)
+    if file_name := fetch_last_modified_kp_forecast_file():
+        try:
+            file_date = file_name.split()[3]
+            file_date = file_date.replace(".", "-")
+            formatted_data = convert_into_json(file_name=file_name)
+            if formatted_data is None:
+                return None
+            return file_date, formatted_data
+        except Exception as e:
+            current_app.logger.error(f"Error detected: {e}")
+            return None
 
-        return file_date, formatted_data
-    except ValueError as e:
-        return f"There is some issue in desired file fetching: {e}"

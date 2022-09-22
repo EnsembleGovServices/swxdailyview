@@ -1,12 +1,34 @@
+import os
+
+import sentry_sdk
+from dotenv import load_dotenv
 from flask import Flask
 
 from config import app_config
+
+load_dotenv()
+DNS_FOR_SENTRY = os.getenv("DNS_FOR_SENTRY")
 
 
 def create_app(env_name):
     """
     Create app
     """
+
+    # sentry initialization
+    from sentry_sdk.integrations.flask import FlaskIntegration
+
+    sentry_sdk.init(
+        dsn=DNS_FOR_SENTRY,
+        integrations=[
+            FlaskIntegration(),
+        ],
+
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # We recommend adjusting this value in production.
+        traces_sample_rate=1.0
+    )
 
     # Initialize the main application.
     app = Flask(__name__)
@@ -15,7 +37,6 @@ def create_app(env_name):
     app.logger.info("Environment variable configured with app")
 
     with app.app_context():
-
         # import routes
         from SWx_Dailly_View_Project.kp_forecast import routes as kp_forecast
         from SWx_Dailly_View_Project.goes_proton_flux import routes as proton_flux
