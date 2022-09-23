@@ -8,6 +8,10 @@ class FetchFileUtil:
 
     @staticmethod
     def fetch_last_modified_proton_flux_file():
+        """
+            Fetch last modified file from the 'PROTON_FLUX_FOLDER_NAME' folder
+            :return: The last modified file name --> str format
+        """
         try:
             bucket_data = fetch_bucket_data()
             lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=PROTON_FLUX_FOLDER_NAME)]

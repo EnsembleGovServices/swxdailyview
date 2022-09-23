@@ -12,6 +12,12 @@ class GetTodayKpService:
 
     @staticmethod
     def kp_rate_today():
+        """
+            Finds Today Kp index with its noaa_scale value
+            :param : None
+            :return: if GET data is correct then instance data or else gives error message
+                    [ o/p includes kp_index & noaa_scale value ]
+        """
         if not formatted_data_fetch():
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
@@ -38,6 +44,9 @@ class GetTodayKpService:
 
     @staticmethod
     def time_interval_kp_rate(rate):
+        """
+            Converts the csv data into interval
+        """
 
         time_interval = rate['time_tag'].split(":", 1)[0]
         if time_interval.split(" ", 1)[1] == "00":
@@ -99,6 +108,9 @@ class GetTodayKpService:
 
     @staticmethod
     def kp_rate_as_per_intervals():
+        """
+            fetch kp rates as per intervals
+        """
 
         if not formatted_data_fetch():
             return Response(status_code=HTTPStatus.BAD_REQUEST,
@@ -111,6 +123,9 @@ class GetTodayKpService:
 
     @staticmethod
     def predicted_kp_index():
+        """
+            finds the highest predicted kp index rate value for next 3 days
+        """
         if not formatted_data_fetch():
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()

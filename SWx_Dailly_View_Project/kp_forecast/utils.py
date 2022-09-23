@@ -24,10 +24,16 @@ class FetchFileData:
         self.aws_secret_access_key = aws_secret_access_key
 
     def get_client(self):
+        """
+            Get the boto3 client
+        """
         return boto3.client("s3", aws_access_key_id=self.aws_access_key_id,
                             aws_secret_access_key=self.aws_secret_access_key)
 
     def fetch_response(self, bucket_name, file_name=None):
+        """
+            Fetch response from the bucket for desired file
+        """
         s3_client = FetchFileData.get_client(self)
 
         if not file_name:
@@ -45,6 +51,9 @@ class FetchFileData:
 
     @staticmethod
     def format_json(response):
+        """
+            format the json file data into dictionary format
+        """
         response_data = response
         top_row = response_data[0]
         total_column = len(top_row)
@@ -58,6 +67,9 @@ data_fetcher = FetchFileData(ACCESS_KEY, SECRET_KEY)
 
 # the second way to convert json data into dictionary file formate:
 def convert_into_json(file_name):
+    """
+        Converts the desired json file into dictionary format
+    """
     try:
         s3 = boto3.resource('s3', aws_access_key_id=ACCESS_KEY,
                             aws_secret_access_key=SECRET_KEY)
@@ -75,6 +87,10 @@ def convert_into_json(file_name):
 
 
 def fetch_last_modified_kp_forecast_file():
+    """
+        Fetch the latest file from the bucket [ last modified ]
+        for the 'KP_INDEX_FOLDER_NAME' folder
+    """
     try:
         conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
         s3 = conn.resource('s3')
@@ -91,6 +107,10 @@ def fetch_last_modified_kp_forecast_file():
 
 
 def formatted_data_fetch():
+    """
+        return the formatted data for the desired fetch file
+        o/p: --> in the dictionary formatted data
+    """
     if file_name := fetch_last_modified_kp_forecast_file():
         try:
             file_date = file_name.split()[3]

@@ -7,7 +7,7 @@ from SWx_Dailly_View_Project.kp_forecast.resources import GetKpData, GetInterval
 kp_blueprint = Blueprint('kp_blueprint', __name__)
 kp_service_rest_api = Api(kp_blueprint)
 
-# kp blueprint routes
+# kp blueprint routes add resources
 kp_service_rest_api.add_resource(Root, '/')
 kp_service_rest_api.add_resource(GetKpData, '/current-kp-index')
 kp_service_rest_api.add_resource(GetIntervalKpData, '/get-interval-kp-data')

@@ -14,6 +14,14 @@ class GetProtonFluxService:
 
     @staticmethod
     def proton_flux_data(request):
+        """
+            Returns the response in dictionary format
+            for particular requested time period such as here we have
+            [ 6 Hours, 1 day, 3 days, 7 days ]
+            :params: file_name which has the last modified file from the s3 buckets
+            csv_data: is the pandas dataframe converted csv file into dataframe
+            will get data in 3 parts [ gt_10,gt_50,gt_100 ] respectively.
+        """
 
         s3_client = get_s3_client()
 

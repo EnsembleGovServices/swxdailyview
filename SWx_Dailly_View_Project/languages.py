@@ -12,9 +12,10 @@ class Response:
         self.errors = errors
 
     def send_error_response(self):
-
+        """
+            send the Response for errors occurrence while fetching OUTPUT
+        """
         response = self.errors or {'error': self.message or self.status_code.description}
-
         app.logger.error(response)
         return response, self.status_code
 

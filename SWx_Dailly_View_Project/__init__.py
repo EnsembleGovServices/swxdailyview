@@ -12,7 +12,9 @@ DNS_FOR_SENTRY = os.getenv("DNS_FOR_SENTRY")
 
 def create_app(env_name):
     """
-    Create app
+    Creates main FLASK app with all necessary initialization
+    [   Here we included --> sentry integration [ for errors monitoring ],
+        Registering Flask API BLUEPRINTS from respective Folder's routes  ]
     """
 
     # sentry initialization
