@@ -10,6 +10,9 @@ bucket_data = fetch_bucket_data()
 
 
 def fetch_last_modified_mid_latitude_file():
+    """
+        Fetch last modified file for 'MID_LATITUDE_FOLDER_NAME' folder
+    """
     try:
         lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=MID_LATITUDE_FOLDER_NAME)]
 
@@ -22,6 +25,9 @@ def fetch_last_modified_mid_latitude_file():
 
 
 def fetch_last_modified_high_latitude_file():
+    """
+        Fetch last modified file for 'HIGH_LATITUDE_FOLDER_NAME' folder
+    """
     try:
         lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME)]
         for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME):

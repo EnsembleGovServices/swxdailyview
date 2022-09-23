@@ -8,6 +8,11 @@ class GetMidLatitude(Resource):
 
     @classmethod
     def get(cls):
+        """
+            Fetch Mid-latitude data with proper percentage wise data
+            [ G1 -> minor, G2 -> moderate, G3 -> strong, G4 -> severe, G5 -> extreme ]
+            :return: if GET data is correct then instance data or else gives error message
+        """
         return cls.mid_latitude_obj.get_mid_latitude()
 
 
@@ -16,4 +21,9 @@ class GetHighLatitude(Resource):
 
     @classmethod
     def get(cls):
+        """
+            Fetch High-latitude data with proper percentage wise data
+            [ G1 -> minor, G2 -> moderate, G3 -> strong, G4 -> severe, G5 -> extreme ]
+            :return: if GET data is correct then instance data or else gives error message
+        """
         return cls.high_latitude_obj.get_high_latitude()
