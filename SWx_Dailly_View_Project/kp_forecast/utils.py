@@ -5,7 +5,7 @@ import boto3
 from dotenv import load_dotenv
 from flask import current_app
 
-from SWx_Dailly_View_Project.constants import KP_INDEX_FOLDER_NAME
+from SWx_Dailly_View_Project.constants import KP_INDEX_FOLDER_NAME, ERROR_DETECTED
 
 load_dotenv()
 
@@ -70,7 +70,7 @@ def convert_into_json(file_name):
         return [{top_row[col_index]: response_row[col_index] for col_index in range(total_column)} for response_row in
                 json_content[1:]]
     except Exception as e:
-        current_app.logger.error(f"Error detected: {e}")
+        current_app.logger.error(ERROR_DETECTED.format(e))
         return None
 
 
@@ -86,7 +86,7 @@ def fetch_last_modified_kp_forecast_file():
                 latest_file = x.key
         return latest_file
     except Exception as e:
-        current_app.logger.error(f"Error detected: {e}")
+        current_app.logger.error(ERROR_DETECTED.format(e))
         return None
 
 
@@ -100,6 +100,6 @@ def formatted_data_fetch():
                 return None
             return file_date, formatted_data
         except Exception as e:
-            current_app.logger.error(f"Error detected: {e}")
+            current_app.logger.error(ERROR_DETECTED.format(e))
             return None
 

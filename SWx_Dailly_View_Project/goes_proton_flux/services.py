@@ -1,9 +1,12 @@
 from datetime import timedelta, datetime
+from http import HTTPStatus
 
 import pandas as pd
 from io import StringIO
 
-from SWx_Dailly_View_Project.goes_proton_flux import utils
+from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED
+from SWx_Dailly_View_Project.goes_proton_flux.utils import FetchFileUtil
+from SWx_Dailly_View_Project.languages import Response
 from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME
 
 
@@ -16,7 +19,11 @@ class GetProtonFluxService:
 
         # fetch particular file from the bucket
         # file_name = 'proton flux/Proton Flux 2022.09.15 1200.csv' [ for sample file name ]
-        file_name = utils.fetch_last_modified_proton_flux_file()
+        fetch_file_obj = FetchFileUtil()
+        if not fetch_file_obj.fetch_last_modified_proton_flux_file():
+            return Response(status_code=HTTPStatus.BAD_REQUEST,
+                            message=FILE_NOT_FETCHED).send_error_response()
+        file_name = fetch_file_obj.fetch_last_modified_proton_flux_file()
         response = s3_client.get_object(Bucket=BUCKET_NAME, Key=file_name)
         raw_data = response.get('Body')
         data = raw_data.read().decode('UTF-8')

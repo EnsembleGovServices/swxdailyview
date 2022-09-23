@@ -18,11 +18,4 @@ class Response:
         app.logger.error(response)
         return response, self.status_code
 
-    def send_success_response(self):
-
-        response = {'message': self.message or 'Success'}
-        if self.data:
-            response["data"] = self.data
-        app.logger.info(response['message'])
-        return response, self.status_code
 
