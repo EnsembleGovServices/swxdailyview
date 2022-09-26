@@ -4,7 +4,8 @@ from http import HTTPStatus
 import pandas as pd
 from io import StringIO
 
-from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED
+from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED, REQUESTED_PARA_IS_INVALID_ARGS, \
+    INVALID_INTERVAL_FOR_HOURS, INVALID_INTERVAL_FOR_DAYS
 from SWx_Dailly_View_Project.goes_proton_flux.utils import FetchFileUtil
 from SWx_Dailly_View_Project.languages import Response
 from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME
@@ -24,6 +25,19 @@ class GetProtonFluxService:
         """
 
         s3_client = get_s3_client()
+        valid_args = ['hours', 'days']
+        valid_args_value = [1, 3, 7]
+        keys = request.args.to_dict().keys()
+        for i in keys:
+            if i not in valid_args:
+                return Response(status_code=HTTPStatus.BAD_REQUEST,
+                                message=REQUESTED_PARA_IS_INVALID_ARGS).send_error_response()
+        if request.args.get('hours') and int(request.args.get('hours')) != 6:
+            return Response(status_code=HTTPStatus.BAD_REQUEST,
+                            message=INVALID_INTERVAL_FOR_HOURS).send_error_response()
+        if request.args.get('days') and int(request.args.get('days')) not in valid_args_value:
+            return Response(status_code=HTTPStatus.BAD_REQUEST,
+                            message=INVALID_INTERVAL_FOR_DAYS).send_error_response()
 
         # fetch particular file from the bucket
         # file_name = 'proton flux/Proton Flux 2022.09.15 1200.csv' [ for sample file name ]
@@ -79,7 +93,8 @@ class GetProtonFluxService:
                     format_date += new_date[i]
                 desired_three_dates.append(format_date)
 
-            drop_lis = [i for i in range(len(csv_data)) if csv_data.iloc[i]['time_tag'].split()[0] not in desired_three_dates]
+            drop_lis = [i for i in range(len(csv_data)) if
+                        csv_data.iloc[i]['time_tag'].split()[0] not in desired_three_dates]
 
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
@@ -94,7 +109,9 @@ class GetProtonFluxService:
             for index, item in enumerate(desired_time_lis):
                 desired_time_lis[index] = item.replace('-', '/')
 
-            drop_lis = [i for i in range(len(csv_data)) if (str(datetime.strptime(str(csv_data.iloc[i]['time_tag'][:13]), '%m/%d/%Y %H'))[:13]).replace('-', '/') not in desired_time_lis]
+            drop_lis = [i for i in range(len(csv_data)) if
+                        (str(datetime.strptime(str(csv_data.iloc[i]['time_tag'][:13]), '%m/%d/%Y %H'))[:13]).replace(
+                            '-', '/') not in desired_time_lis]
 
             csv_data.drop(drop_lis, axis=0, inplace=True)
 

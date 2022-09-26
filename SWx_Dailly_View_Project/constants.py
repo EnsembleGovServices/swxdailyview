@@ -11,3 +11,8 @@ ISSUE_IN_FETCHING_DATA = 'There is some issue in data fetching from file'
 # constants for TRY & EXCEPTION
 STATUS = 'status'
 ERROR_DETECTED = "Error detected: {}"
+
+# Validations
+REQUESTED_PARA_IS_INVALID_ARGS = 'Requested Interval is invalid You have only [ 6 hours, 1/3/7 days options]'
+INVALID_INTERVAL_FOR_HOURS = 'Hours requested must be 6 hours only.'
+INVALID_INTERVAL_FOR_DAYS = 'Days requested must be 1 day, 3 day or 7 day only.'
