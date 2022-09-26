@@ -1,3 +1,4 @@
+from collections import Counter
 from io import StringIO
 
 import pandas as pd
@@ -50,7 +51,12 @@ def get_csv_data(file_name):
         return None
 
 
-def get_g_percentage(count_for_kp):
+def get_g_percentage(file_name):
+    csv_data = get_csv_data(file_name)
+    predicted_days_kp = [csv_data.iloc[i][2] for i in range(len(csv_data))] + [csv_data.iloc[i][3] for i in
+                                                                               range(len(csv_data))]
+    count_for_kp = Counter(predicted_days_kp)
+
     try:
         kp_rates = {i: count_for_kp[i] if i in count_for_kp.keys() else 0 for i in range(1, 10)}
         g_percentage = {}

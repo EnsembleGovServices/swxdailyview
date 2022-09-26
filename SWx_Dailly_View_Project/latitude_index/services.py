@@ -1,10 +1,9 @@
-from collections import Counter
 from http import HTTPStatus
 
 from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED, ISSUE_IN_FETCHING_DATA
 from SWx_Dailly_View_Project.languages import Response
 from SWx_Dailly_View_Project.latitude_index.utils import fetch_last_modified_mid_latitude_file, \
-    fetch_last_modified_high_latitude_file, get_g_percentage, get_csv_data
+    fetch_last_modified_high_latitude_file, get_g_percentage
 
 
 class GetMidLatitudeResource:
@@ -19,14 +18,12 @@ class GetMidLatitudeResource:
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
         file_name = fetch_last_modified_mid_latitude_file()
-        csv_data = get_csv_data(file_name)
-        predicted_days_kp = [csv_data.iloc[i][2] for i in range(len(csv_data))] + [csv_data.iloc[i][3] for i in
-                                                                                   range(len(csv_data))]
-        if not get_g_percentage(Counter(predicted_days_kp)):
+
+        if not get_g_percentage(file_name):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=ISSUE_IN_FETCHING_DATA).send_error_response()
 
-        return get_g_percentage(Counter(predicted_days_kp))
+        return get_g_percentage(file_name)
 
 
 class GetHighLatitudeResource:
@@ -40,11 +37,8 @@ class GetHighLatitudeResource:
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
         file_name = fetch_last_modified_high_latitude_file()
-        csv_data = get_csv_data(file_name)
-        predicted_days_kp = [csv_data.iloc[i][2] for i in range(len(csv_data))] + [csv_data.iloc[i][3] for i in
-                                                                                   range(len(csv_data))]
-        if not get_g_percentage(Counter(predicted_days_kp)):
+
+        if not get_g_percentage(file_name):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=ISSUE_IN_FETCHING_DATA).send_error_response()
-
-        return get_g_percentage(Counter(predicted_days_kp))
+        return get_g_percentage(file_name)
