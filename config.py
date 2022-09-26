@@ -16,7 +16,16 @@ class Production(BaseConfig):
     DEBUG = False
 
 
+class Testing(BaseConfig):
+    """
+    Production environment configuration
+    """
+    TESTING = True
+
+
 app_config = {
     'development': Development,
-    'production': Production
+    'production': Production,
+    'testing': Testing
 }
+
