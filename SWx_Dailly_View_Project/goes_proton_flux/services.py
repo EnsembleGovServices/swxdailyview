@@ -25,17 +25,19 @@ class GetProtonFluxService:
         """
 
         s3_client = get_s3_client()
-        valid_args = ['hours', 'days']
-        valid_args_value = [1, 3, 7]
+        valid_arguments = {
+            'hours': "6",
+            'days': ['1', '3', '7']
+        }
         keys = request.args.to_dict().keys()
         for i in keys:
-            if i not in valid_args:
+            if i not in valid_arguments.keys():
                 return Response(status_code=HTTPStatus.BAD_REQUEST,
                                 message=REQUESTED_PARA_IS_INVALID_ARGS).send_error_response()
-        if request.args.get('hours') and int(request.args.get('hours')) != 6:
+        if request.args.get('hours') and request.args.get('hours') != '6':
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=INVALID_INTERVAL_FOR_HOURS).send_error_response()
-        if request.args.get('days') and int(request.args.get('days')) not in valid_args_value:
+        if request.args.get('days') and request.args.get('days') not in valid_arguments['days']:
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=INVALID_INTERVAL_FOR_DAYS).send_error_response()
 
