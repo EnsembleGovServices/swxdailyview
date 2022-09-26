@@ -83,7 +83,7 @@ class GetProtonFluxService:
 
             csv_data.drop(drop_lis, axis=0, inplace=True)
 
-        if request.args.get("Hours") == "6":
+        if request.args.get("hours") == "6":
             str_date = desired_date + " 15:00:00"
             current_date = datetime.strptime(str_date, '%m/%d/%Y %H:%M:%S')
             desired_time_lis = [str(current_date)[:13]]
