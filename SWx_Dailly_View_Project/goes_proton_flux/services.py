@@ -27,7 +27,8 @@ class GetProtonFluxService:
         s3_client = get_s3_client()
         valid_arguments = {
             'hours': "6",
-            'days': ['1', '3', '7']
+            'days': ['1', '3', '7'],
+            'time_stamp': None
         }
         keys = request.args.to_dict().keys()
         for i in keys:
@@ -43,11 +44,17 @@ class GetProtonFluxService:
 
         # fetch particular file from the bucket
         # file_name = 'proton flux/Proton Flux 2022.09.15 1200.csv' [ for sample file name ]
+        if request.args.get('time_stamp'):
+            time_stamp = int(request.args.get('time_stamp'))
+        else:
+            time_stamp = datetime.now().timestamp()
+
         fetch_file_obj = FetchFileUtil()
-        if not fetch_file_obj.fetch_last_modified_proton_flux_file():
+        if not fetch_file_obj.fetch_file_name(time_stamp):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
-        file_name = fetch_file_obj.fetch_last_modified_proton_flux_file()
+
+        file_name = fetch_file_obj.fetch_file_name(time_stamp)
         response = s3_client.get_object(Bucket=BUCKET_NAME, Key=file_name)
         raw_data = response.get('Body')
         data = raw_data.read().decode('UTF-8')
