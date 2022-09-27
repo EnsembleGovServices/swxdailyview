@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 import boto3
 from dotenv import load_dotenv
@@ -12,57 +13,6 @@ load_dotenv()
 ACCESS_KEY = os.getenv("ACCESS_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
 BUCKET_NAME = os.getenv("BUCKET_NAME")
-
-
-class FetchFileData:
-    """
-        takes desired file & convert into dictionary format
-    """
-
-    def __init__(self, aws_access_key_id, aws_secret_access_key):
-        self.aws_access_key_id = aws_access_key_id
-        self.aws_secret_access_key = aws_secret_access_key
-
-    def get_client(self):
-        """
-            Get the boto3 client
-        """
-        return boto3.client("s3", aws_access_key_id=self.aws_access_key_id,
-                            aws_secret_access_key=self.aws_secret_access_key)
-
-    def fetch_response(self, bucket_name, file_name=None):
-        """
-            Fetch response from the bucket for desired file
-        """
-        s3_client = FetchFileData.get_client(self)
-
-        if not file_name:
-            return ValueError('You must pass the file for conversion')
-
-        response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
-
-        raw_data = response.get('Body')
-        if not raw_data:
-            raise ValueError('Response does not have \'Body\' attribute.')
-
-        data = raw_data.read().decode('UTF-8')
-        response = json.loads(data)
-        return FetchFileData.format_json(response)
-
-    @staticmethod
-    def format_json(response):
-        """
-            format the json file data into dictionary format
-        """
-        response_data = response
-        top_row = response_data[0]
-        total_column = len(top_row)
-
-        return [{top_row[col_index]: response_row[col_index] for col_index in range(total_column)} for response_row in
-                response_data[1:]]
-
-
-data_fetcher = FetchFileData(ACCESS_KEY, SECRET_KEY)
 
 
 # the second way to convert json data into dictionary file formate:
@@ -86,40 +36,35 @@ def convert_into_json(file_name):
         return None
 
 
-def fetch_last_modified_kp_forecast_file():
+def convert_timestamp_to_file_name(time_stamp):
     """
-        Fetch the latest file from the bucket [ last modified ]
-        for the 'KP_INDEX_FOLDER_NAME' folder
+        This function will convert the timestamp into date and time : str
+    """
+    datetime_obj = datetime.fromtimestamp(time_stamp)
+    date = str(datetime_obj.date()).replace('-', '.')
+    time = str(datetime_obj).split()[1].split(":")[0] + str(datetime_obj).split()[1].split(":")[1]
+    return f"{date} {time}"
+
+
+def formatted_data_fetch(file_name):
+    """
+        This function finds the file from bucket and convert data into desired format
+        for the further usage
     """
     try:
         conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
         s3 = conn.resource('s3')
         bucket_data = s3.Bucket(BUCKET_NAME)
-        latest_file = None
-        lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME)]
-        for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME):
-            if x.last_modified == lis[-1]:
-                latest_file = x.key
-        return latest_file
+        files = [x.key for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME) if
+                 str(x.key).split()[3] == file_name.split()[0] and str(x.key).split()[4].split(".")[0][:2] ==
+                 file_name.split()[1][:2] and str(x.key).split()[4].split(".")[0] <= file_name.split()[1]]
+        desired_file = files[-1]
+        file_date = desired_file.split()[3]
+        file_date = file_date.replace(".", "-")
+        formatted_data = convert_into_json(file_name=desired_file)
+        if formatted_data is None:
+            return None
+        return file_date, formatted_data
     except Exception as e:
         current_app.logger.error(ERROR_DETECTED.format(e))
         return None
-
-
-def formatted_data_fetch():
-    """
-        return the formatted data for the desired fetch file
-        o/p: --> in the dictionary formatted data
-    """
-    if file_name := fetch_last_modified_kp_forecast_file():
-        try:
-            file_date = file_name.split()[3]
-            file_date = file_date.replace(".", "-")
-            formatted_data = convert_into_json(file_name=file_name)
-            if formatted_data is None:
-                return None
-            return file_date, formatted_data
-        except Exception as e:
-            current_app.logger.error(ERROR_DETECTED.format(e))
-            return None
-

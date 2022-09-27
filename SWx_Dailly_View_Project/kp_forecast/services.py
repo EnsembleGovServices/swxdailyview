@@ -3,8 +3,10 @@ from collections import Counter
 from datetime import datetime, timedelta
 from http import HTTPStatus
 
+from flask import request
+
 from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED
-from SWx_Dailly_View_Project.kp_forecast.utils import formatted_data_fetch
+from SWx_Dailly_View_Project.kp_forecast.utils import formatted_data_fetch, convert_timestamp_to_file_name
 from SWx_Dailly_View_Project.languages import Response
 
 
@@ -18,10 +20,16 @@ class GetTodayKpService:
             :return: if GET data is correct then instance data or else gives error message
                     [ o/p includes kp_index & noaa_scale value ]
         """
-        if not formatted_data_fetch():
+        if request.args.get('time_stamp'):
+            time_stamp = int(request.args.get('time_stamp'))
+        else:
+            time_stamp = datetime.now().timestamp()
+
+        file_name = convert_timestamp_to_file_name(time_stamp)
+        if not formatted_data_fetch(file_name):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
-        file_date, formatted_data = formatted_data_fetch()
+        file_date, formatted_data = formatted_data_fetch(file_name)
         kp_rates_output = [data['kp'] for data in formatted_data if data['time_tag'].split(" ", 1)[0] == file_date]
         kp_rate_dict = dict(Counter(kp_rates_output))
         response = {'kp_index': max(kp_rate_dict, key=kp_rate_dict.get)}
@@ -111,12 +119,18 @@ class GetTodayKpService:
         """
             fetch kp rates as per intervals
         """
+        if request.args.get('time_stamp'):
+            time_stamp = int(request.args.get('time_stamp'))
+        else:
+            time_stamp = datetime.now().timestamp()
 
-        if not formatted_data_fetch():
+        file_name = convert_timestamp_to_file_name(time_stamp)
+
+        if not formatted_data_fetch(file_name):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
 
-        file_date, formatted_data = formatted_data_fetch()
+        file_date, formatted_data = formatted_data_fetch(file_name)
 
         return [GetTodayKpService.time_interval_kp_rate(i) for i in formatted_data if
                 i['time_tag'].split(" ", 1)[0] == file_date]
@@ -126,11 +140,17 @@ class GetTodayKpService:
         """
             finds the highest predicted kp index rate value for next 3 days
         """
-        if not formatted_data_fetch():
+        if request.args.get('time_stamp'):
+            time_stamp = int(request.args.get('time_stamp'))
+        else:
+            time_stamp = datetime.now().timestamp()
+
+        file_name = convert_timestamp_to_file_name(time_stamp)
+        if not formatted_data_fetch(file_name):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
 
-        file_date, formatted_data = formatted_data_fetch()
+        file_date, formatted_data = formatted_data_fetch(file_name)
 
         predicted_data = [data for data in formatted_data if data['observed'] == 'predicted']
 
