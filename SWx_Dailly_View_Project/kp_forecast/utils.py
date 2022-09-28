@@ -52,13 +52,23 @@ def formatted_data_fetch(file_name):
         for the further usage
     """
     try:
+        desired_file = None
         conn = boto3.session.Session(aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
         s3 = conn.resource('s3')
         bucket_data = s3.Bucket(BUCKET_NAME)
-        files = [x.key for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME) if
-                 str(x.key).split()[3] == file_name.split()[0] and str(x.key).split()[4].split(".")[0][:2] ==
-                 file_name.split()[1][:2] and str(x.key).split()[4].split(".")[0] <= file_name.split()[1]]
-        desired_file = files[-1]
+        if files := [x.key for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME) if str(x.key).split()[3] == file_name.split()[0] and str(x.key).split()[4].split(".")[0][:2] == file_name.split()[1][:2] and str(x.key).split()[4].split(".")[0] <= file_name.split()[1]]:
+            desired_file = files[-1]
+        else:
+            try:
+                lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME)]
+
+                for x in bucket_data.objects.filter(Prefix=KP_INDEX_FOLDER_NAME):
+                    if x.last_modified == lis[-1]:
+                        desired_file = x.key
+            except Exception as e:
+                current_app.logger.error(ERROR_DETECTED.format(e))
+                return None
+
         file_date = desired_file.split()[3]
         file_date = file_date.replace(".", "-")
         formatted_data = convert_into_json(file_name=desired_file)
