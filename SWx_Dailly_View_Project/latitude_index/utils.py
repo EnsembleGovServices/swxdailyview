@@ -17,7 +17,6 @@ def fetch_latitude_file_name(time_stamp, folder_name):
         date = str(datetime_obj.date()).replace('-', '.')
         time = str(datetime_obj).split()[1].split(":")[0] + str(datetime_obj).split()[1].split(":")[1]
         file_name = f"{date} {time}"
-        print("this is file_name: ", file_name)
         if files := [x.key for x in bucket_data.objects.filter(Prefix=folder_name) if
                      str(x.key).split()[7] == file_name.split()[0] and (str(x.key).split()[8]).split(".")[0] <=
                      file_name.split()[1]]:
