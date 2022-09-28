@@ -166,4 +166,4 @@ class GetTodayKpService:
         predicted_next_three_days_kp = [observed_predicted_dates['kp'] for observed_predicted_dates in predicted_data if
                                         observed_predicted_dates['time_tag'].split(" ", 1)[0] in next_three_dates]
 
-        return max(predicted_next_three_days_kp)
+        return {'highest_predicted_kp_index': max(predicted_next_three_days_kp)}
