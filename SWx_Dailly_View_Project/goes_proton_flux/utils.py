@@ -19,7 +19,18 @@ class FetchFileUtil:
             files = [x.key for x in bucket_data.objects.filter(Prefix=PROTON_FLUX_FOLDER_NAME) if
                      str(x.key).split()[3] == file_name.split()[0] and str(x.key).split()[4].split(".")[0][:2] ==
                      file_name.split()[1][:2] and str(x.key).split()[4].split(".")[0] <= file_name.split()[1]]
-            return files[-1]
+            if files:
+                return files[-1]
+            else:
+                try:
+                    lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=PROTON_FLUX_FOLDER_NAME)]
+
+                    for x in bucket_data.objects.filter(Prefix=PROTON_FLUX_FOLDER_NAME):
+                        if x.last_modified == lis[-1]:
+                            return x.key
+                except Exception as e:
+                    current_app.logger.error(ERROR_DETECTED.format(e))
+                    return None
         except Exception as e:
             current_app.logger.error(ERROR_DETECTED.format(e))
             return None
