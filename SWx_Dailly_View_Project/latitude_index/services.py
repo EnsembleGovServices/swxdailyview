@@ -1,9 +1,12 @@
+from datetime import datetime
 from http import HTTPStatus
 
-from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED, ISSUE_IN_FETCHING_DATA
+from flask import request
+
+from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED, ISSUE_IN_FETCHING_DATA, HIGH_LATITUDE_FOLDER_NAME, \
+    MID_LATITUDE_FOLDER_NAME
 from SWx_Dailly_View_Project.languages import Response
-from SWx_Dailly_View_Project.latitude_index.utils import fetch_last_modified_mid_latitude_file, \
-    fetch_last_modified_high_latitude_file, get_g_percentage
+from SWx_Dailly_View_Project.latitude_index.utils import get_g_percentage, fetch_latitude_file_name
 
 
 class GetMidLatitudeResource:
@@ -14,11 +17,17 @@ class GetMidLatitudeResource:
             Returns mid latitude data in percentage noaa_scale prediction probability
         """
         # g_dict = {5: 'G1', 6: 'G2', 7: 'G3', 8: 'G4', 9: 'G5'}
-        if not fetch_last_modified_mid_latitude_file():
+
+        if request.args.get('time_stamp'):
+            time_stamp = int(request.args.get('time_stamp'))
+        else:
+            time_stamp = datetime.now().timestamp()
+        if not fetch_latitude_file_name(time_stamp=time_stamp,
+                                        folder_name=MID_LATITUDE_FOLDER_NAME):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
-        file_name = fetch_last_modified_mid_latitude_file()
-
+        file_name = fetch_latitude_file_name(time_stamp=time_stamp,
+                                             folder_name=MID_LATITUDE_FOLDER_NAME)
         if not get_g_percentage(file_name):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=ISSUE_IN_FETCHING_DATA).send_error_response()
@@ -33,11 +42,16 @@ class GetHighLatitudeResource:
         """
             Returns high latitude data in percentage noaa_scale prediction probability
         """
-        if not fetch_last_modified_high_latitude_file():
+        if request.args.get('time_stamp'):
+            time_stamp = int(request.args.get('time_stamp'))
+        else:
+            time_stamp = datetime.now().timestamp()
+        if not fetch_latitude_file_name(time_stamp=time_stamp,
+                                        folder_name=HIGH_LATITUDE_FOLDER_NAME):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=FILE_NOT_FETCHED).send_error_response()
-        file_name = fetch_last_modified_high_latitude_file()
-
+        file_name = fetch_latitude_file_name(time_stamp=time_stamp,
+                                             folder_name=HIGH_LATITUDE_FOLDER_NAME)
         if not get_g_percentage(file_name):
             return Response(status_code=HTTPStatus.BAD_REQUEST,
                             message=ISSUE_IN_FETCHING_DATA).send_error_response()

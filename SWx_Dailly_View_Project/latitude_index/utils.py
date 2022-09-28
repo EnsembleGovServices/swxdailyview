@@ -1,39 +1,36 @@
 from collections import Counter
+from datetime import datetime
 from io import StringIO
 
 import pandas as pd
 from flask import current_app
 
-from SWx_Dailly_View_Project.constants import MID_LATITUDE_FOLDER_NAME, HIGH_LATITUDE_FOLDER_NAME, ERROR_DETECTED
+from SWx_Dailly_View_Project.constants import ERROR_DETECTED
 from SWx_Dailly_View_Project.s3_services import fetch_bucket_data, get_s3_client, BUCKET_NAME
 
 bucket_data = fetch_bucket_data()
 
 
-def fetch_last_modified_mid_latitude_file():
-    """
-        Fetch last modified file for 'MID_LATITUDE_FOLDER_NAME' folder
-    """
+def fetch_latitude_file_name(time_stamp, folder_name):
     try:
-        lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=MID_LATITUDE_FOLDER_NAME)]
+        datetime_obj = datetime.fromtimestamp(time_stamp)
+        date = str(datetime_obj.date()).replace('-', '.')
+        time = str(datetime_obj).split()[1].split(":")[0] + str(datetime_obj).split()[1].split(":")[1]
+        file_name = f"{date} {time}"
+        print("this is file_name: ", file_name)
+        if files := [x.key for x in bucket_data.objects.filter(Prefix=folder_name) if
+                     str(x.key).split()[7] == file_name.split()[0] and (str(x.key).split()[8]).split(".")[0] <=
+                     file_name.split()[1]]:
+            return files[-1]
+        try:
+            lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=folder_name)]
 
-        for x in bucket_data.objects.filter(Prefix=MID_LATITUDE_FOLDER_NAME):
-            if x.last_modified == lis[-1]:
-                return x.key
-    except Exception as e:
-        current_app.logger.error(ERROR_DETECTED.format(e))
-        return None
-
-
-def fetch_last_modified_high_latitude_file():
-    """
-        Fetch last modified file for 'HIGH_LATITUDE_FOLDER_NAME' folder
-    """
-    try:
-        lis = [x.last_modified for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME)]
-        for x in bucket_data.objects.filter(Prefix=HIGH_LATITUDE_FOLDER_NAME):
-            if x.last_modified == lis[-1]:
-                return x.key
+            for x in bucket_data.objects.filter(Prefix=folder_name):
+                if x.last_modified == lis[-1]:
+                    return x.key
+        except Exception as e:
+            current_app.logger.error(ERROR_DETECTED.format(e))
+            return None
     except Exception as e:
         current_app.logger.error(ERROR_DETECTED.format(e))
         return None
