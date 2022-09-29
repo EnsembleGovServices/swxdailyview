@@ -132,20 +132,20 @@ class GetProtonFluxService:
 
         for i in range(len(csv_data)):
 
-            if 10 <= int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) < 50:
+            if int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) == 10:
                 proton_flux['gt_10'].append(
                     {"time_tag": csv_data.iloc[i]['time_tag'],
                      "flux": csv_data.iloc[i]['flux']
                      }
                 )
-            elif 50 <= int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) < 100:
+            elif int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) == 50:
                 proton_flux['gt_50'].append(
                     {"time_tag": csv_data.iloc[i]['time_tag'],
                      "flux": csv_data.iloc[i]['flux']
                      }
                 )
 
-            elif int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) >= 100:
+            elif int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) == 100:
                 proton_flux['gt_100'].append(
                     {"time_tag": csv_data.iloc[i]['time_tag'],
                      "flux": csv_data.iloc[i]['flux']
