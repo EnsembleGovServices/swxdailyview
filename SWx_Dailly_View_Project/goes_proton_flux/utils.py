@@ -34,3 +34,37 @@ class FetchFileUtil:
         except Exception as e:
             current_app.logger.error(ERROR_DETECTED.format(e))
             return None
+
+
+def get_proton_flux_data_from_csv(csv_data):
+
+    proton_flux = {
+        "gt_10": [],
+        "gt_50": [],
+        "gt_100": [],
+    }
+
+    for i in range(len(csv_data)):
+
+        if int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) == 10:
+            proton_flux['gt_10'].append(
+                {"time_tag": csv_data.iloc[i]['time_tag'],
+                 "flux": csv_data.iloc[i]['flux']
+                 }
+            )
+        elif int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) == 50:
+            proton_flux['gt_50'].append(
+                {"time_tag": csv_data.iloc[i]['time_tag'],
+                 "flux": csv_data.iloc[i]['flux']
+                 }
+            )
+
+        elif int(csv_data.iloc[i]['energy'].split()[0].split("=")[1]) == 100:
+            proton_flux['gt_100'].append(
+                {"time_tag": csv_data.iloc[i]['time_tag'],
+                 "flux": csv_data.iloc[i]['flux']
+                 }
+
+            )
+
+    return proton_flux
