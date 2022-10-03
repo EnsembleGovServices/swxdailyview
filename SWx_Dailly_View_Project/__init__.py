@@ -38,7 +38,7 @@ def create_app(env_name):
 
     # Initialize the main application.
     app = Flask(__name__)
-    app.config['CACHE_TYPE'] = os.getenv('CATCH_TYPE')
+    app.config['CACHE_TYPE'] = os.getenv('CACHE_TYPE')
 
     cache.init_app(app)
 
