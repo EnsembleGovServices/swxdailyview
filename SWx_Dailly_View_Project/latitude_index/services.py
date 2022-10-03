@@ -3,6 +3,7 @@ from http import HTTPStatus
 
 from flask import request
 
+from SWx_Dailly_View_Project import cache
 from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED, ISSUE_IN_FETCHING_DATA, HIGH_LATITUDE_FOLDER_NAME, \
     MID_LATITUDE_FOLDER_NAME
 from SWx_Dailly_View_Project.languages import Response
@@ -12,6 +13,7 @@ from SWx_Dailly_View_Project.latitude_index.utils import get_g_percentage, fetch
 class GetMidLatitudeResource:
 
     @staticmethod
+    @cache.cached(timeout=900)
     def get_mid_latitude():
         """
             Returns mid latitude data in percentage noaa_scale prediction probability
@@ -38,6 +40,7 @@ class GetMidLatitudeResource:
 class GetHighLatitudeResource:
 
     @staticmethod
+    @cache.cached(timeout=900)
     def get_high_latitude():
         """
             Returns high latitude data in percentage noaa_scale prediction probability

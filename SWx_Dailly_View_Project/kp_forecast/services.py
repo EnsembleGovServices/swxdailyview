@@ -5,6 +5,7 @@ from http import HTTPStatus
 
 from flask import request
 
+from SWx_Dailly_View_Project import cache
 from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED
 from SWx_Dailly_View_Project.kp_forecast.utils import formatted_data_fetch, convert_timestamp_to_file_name
 from SWx_Dailly_View_Project.languages import Response
@@ -13,6 +14,7 @@ from SWx_Dailly_View_Project.languages import Response
 class GetTodayKpService:
 
     @staticmethod
+    @cache.cached(timeout=900)
     def kp_rate_today():
         """
             Finds Today Kp index with its noaa_scale value
@@ -47,7 +49,6 @@ class GetTodayKpService:
                 response['noaa_scale'] = 'G5'
         else:
             response['noaa_scale'] = None
-
         return response
 
     @staticmethod
@@ -115,6 +116,7 @@ class GetTodayKpService:
             }
 
     @staticmethod
+    @cache.cached(timeout=900)
     def kp_rate_as_per_intervals():
         """
             fetch kp rates as per intervals
@@ -136,6 +138,7 @@ class GetTodayKpService:
                 i['time_tag'].split(" ", 1)[0] == file_date]
 
     @staticmethod
+    @cache.cached(timeout=900)
     def predicted_kp_index():
         """
             finds the highest predicted kp index rate value for next 3 days

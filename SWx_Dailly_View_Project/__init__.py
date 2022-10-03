@@ -3,10 +3,14 @@ import os
 import sentry_sdk
 from dotenv import load_dotenv
 from flask import Flask
+from flask_caching import Cache
+
 
 from config import app_config
 
 load_dotenv()
+cache = Cache()
+
 DNS_FOR_SENTRY = os.getenv("DNS_FOR_SENTRY")
 
 
@@ -34,6 +38,9 @@ def create_app(env_name):
 
     # Initialize the main application.
     app = Flask(__name__)
+    app.config['CACHE_TYPE'] = os.getenv('CATCH_TYPE')
+
+    cache.init_app(app)
 
     app.config.from_object(app_config[env_name])
     app.logger.info("Environment variable configured with app")

@@ -5,6 +5,7 @@ import pandas
 import pandas as pd
 from io import StringIO
 
+from SWx_Dailly_View_Project import cache
 from SWx_Dailly_View_Project.constants import FILE_NOT_FETCHED, REQUESTED_PARA_IS_INVALID_ARGS, \
     INVALID_INTERVAL_FOR_HOURS, INVALID_INTERVAL_FOR_DAYS, PROTON_FLUX_FOLDER_NAME
 from SWx_Dailly_View_Project.goes_proton_flux.utils import FetchFileUtil, get_proton_flux_data_from_csv
@@ -15,6 +16,7 @@ from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME, fetc
 class GetProtonFluxService:
 
     @staticmethod
+    @cache.cached(timeout=900)
     def proton_flux_data(request):
         """
             Returns the response in dictionary format
