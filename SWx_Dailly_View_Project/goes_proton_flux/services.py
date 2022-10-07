@@ -12,7 +12,6 @@ from SWx_Dailly_View_Project.goes_proton_flux.utils import FetchFileUtil, get_pr
 from SWx_Dailly_View_Project.languages import Response
 from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME, fetch_bucket_data
 
-
 class GetProtonFluxService:
 
     @staticmethod
@@ -114,13 +113,15 @@ class GetProtonFluxService:
             csv_data = csv_data1
 
         if request.args.get("hours") == "6":
-            str_date = desired_date + " 15:00:00"
-            current_date = datetime.strptime(str_date, '%m/%d/%Y %H:%M:%S')
+            datetime_obj = datetime.fromtimestamp(time_stamp)
+            # str_date = desired_date + " 15:00:00"
+            # current_date = datetime.strptime(str(datetime_obj), '%m/%d/%Y %H:%M:%S')
+            current_date = datetime.strptime(datetime.strftime((datetime_obj), "%m/%d/%Y %H:%M:%S"),'%m/%d/%Y %H:%M:%S')
             desired_time_lis = [str(current_date)[:13]]
+
             for _ in range(5):
                 current_date = current_date - timedelta(hours=1)
                 desired_time_lis.append(str(current_date)[:13])
-
             for index, item in enumerate(desired_time_lis):
                 desired_time_lis[index] = item.replace('-', '/')
 
