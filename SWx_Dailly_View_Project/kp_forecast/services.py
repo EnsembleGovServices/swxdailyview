@@ -14,7 +14,7 @@ from SWx_Dailly_View_Project.languages import Response
 class GetTodayKpService:
 
     @staticmethod
-    @cache.cached(timeout=900)
+    @cache.memoize(timeout=900)
     def kp_rate_today():
         """
             Finds Today Kp index with its noaa_scale value
@@ -116,7 +116,7 @@ class GetTodayKpService:
             }
 
     @staticmethod
-    @cache.cached(timeout=900)
+    @cache.memoize(timeout=900)
     def kp_rate_as_per_intervals():
         """
             fetch kp rates as per intervals
@@ -138,7 +138,7 @@ class GetTodayKpService:
                 i['time_tag'].split(" ", 1)[0] == file_date]
 
     @staticmethod
-    @cache.cached(timeout=900)
+    @cache.memoize(timeout=900)
     def predicted_kp_index():
         """
             finds the highest predicted kp index rate value for next 3 days

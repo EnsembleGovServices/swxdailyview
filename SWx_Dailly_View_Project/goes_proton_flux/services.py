@@ -16,7 +16,7 @@ from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME, fetc
 class GetProtonFluxService:
 
     @staticmethod
-    @cache.cached(timeout=900)
+    @cache.memoize(timeout=900)
     def proton_flux_data(request):
         """
             Returns the response in dictionary format
