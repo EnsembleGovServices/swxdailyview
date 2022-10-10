@@ -12,6 +12,7 @@ from SWx_Dailly_View_Project.goes_proton_flux.utils import FetchFileUtil, get_pr
 from SWx_Dailly_View_Project.languages import Response
 from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME, fetch_bucket_data
 
+
 class GetProtonFluxService:
 
     @staticmethod
@@ -116,7 +117,8 @@ class GetProtonFluxService:
             datetime_obj = datetime.fromtimestamp(time_stamp)
             # str_date = desired_date + " 15:00:00"
             # current_date = datetime.strptime(str(datetime_obj), '%m/%d/%Y %H:%M:%S')
-            current_date = datetime.strptime(datetime.strftime((datetime_obj), "%m/%d/%Y %H:%M:%S"),'%m/%d/%Y %H:%M:%S')
+            current_date = datetime.strptime(datetime.strftime((datetime_obj), "%m/%d/%Y %H:%M:%S"),
+                                             '%m/%d/%Y %H:%M:%S')
             desired_time_lis = [str(current_date)[:13]]
 
             for _ in range(5):
@@ -158,7 +160,8 @@ class GetProtonFluxService:
             for i in date:
                 ans = ans + i
             bucket_data = fetch_bucket_data()
-            if lis := [x.key for x in bucket_data.objects.filter(Prefix=PROTON_FLUX_FOLDER_NAME) if str(x.key).split("/")[1].split()[2] == ans]:
+            if lis := [x.key for x in bucket_data.objects.filter(Prefix=PROTON_FLUX_FOLDER_NAME) if
+                       str(x.key).split("/")[1].split()[2] == ans]:
                 second_file_name = lis[-1]
                 response2 = s3_client.get_object(Bucket=BUCKET_NAME, Key=second_file_name)
                 raw_data2 = response2.get('Body')
@@ -170,4 +173,3 @@ class GetProtonFluxService:
             else:
                 csv_data = csv_data1
         return get_proton_flux_data_from_csv(csv_data)
-
