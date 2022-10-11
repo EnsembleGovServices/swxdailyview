@@ -169,7 +169,7 @@ class GetProtonFluxService:
                 csv_data2 = pd.read_csv(StringIO(data2))
 
                 csv_data = pandas.concat([csv_data1, csv_data2]).drop_duplicates().reset_index(drop=True)
-
+                csv_data = csv_data.sort_values(by='time_tag')
             else:
                 csv_data = csv_data1
         return get_proton_flux_data_from_csv(csv_data)
