@@ -193,9 +193,9 @@ directory and the files like requirements.txt, .gitignore, .env, etc.
 In this we have 3 endpoints
 
 ```http
-/current-kp-index
-/get-interval-kp-data
-/predicted-kp-index
+GET /current-kp-index
+GET /get-interval-kp-data
+GET /predicted-kp-index
 ```
 - Current Kp Index
 ```http
