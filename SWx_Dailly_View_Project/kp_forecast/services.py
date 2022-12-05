@@ -35,17 +35,17 @@ class GetTodayKpService:
         kp_rates_output = [data['kp'] for data in formatted_data if data['time_tag'].split(" ", 1)[0] == file_date]
         kp_rate_dict = dict(Counter(kp_rates_output))
         response = {'kp_index': max(kp_rate_dict, key=kp_rate_dict.get)}
-        kp_index = int(response['kp_index'])
-        if kp_index >= 5:
-            if kp_index == 5:
+        kp_index = float(response['kp_index'])
+        if kp_index >= float(5):
+            if kp_index == float(5):
                 response['noaa_scale'] = 'G1'
-            elif kp_index == 6:
+            elif kp_index == float(6):
                 response['noaa_scale'] = 'G2'
-            elif kp_index == 7:
+            elif kp_index == float(7):
                 response['noaa_scale'] = 'G3'
-            elif kp_index == 8:
+            elif kp_index == float(8):
                 response['noaa_scale'] = 'G4'
-            elif kp_index == 9:
+            elif kp_index == float(9):
                 response['noaa_scale'] = 'G5'
         else:
             response['noaa_scale'] = None
