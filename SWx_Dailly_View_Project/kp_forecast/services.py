@@ -168,5 +168,20 @@ class GetTodayKpService:
                             str(next_third_day).split(" ", 1)[0]]
         predicted_next_three_days_kp = [observed_predicted_dates['kp'] for observed_predicted_dates in predicted_data if
                                         observed_predicted_dates['time_tag'].split(" ", 1)[0] in next_three_dates]
-
-        return {'highest_predicted_kp_index': max(predicted_next_three_days_kp)}
+        highest_predicted_kp_index = float(max(predicted_next_three_days_kp))
+        if highest_predicted_kp_index >= float(5):
+            if highest_predicted_kp_index == float(5):
+                noaa_scale = 'G1'
+            elif highest_predicted_kp_index == float(6):
+                noaa_scale = 'G2'
+            elif highest_predicted_kp_index == float(7):
+                noaa_scale = 'G3'
+            elif highest_predicted_kp_index == float(8):
+                noaa_scale = 'G4'
+            elif highest_predicted_kp_index == float(9):
+                noaa_scale = 'G5'
+        else:
+            noaa_scale = None
+        return {'highest_predicted_kp_index': max(predicted_next_three_days_kp),
+                'noaa_scale': noaa_scale
+                }
