@@ -8,7 +8,7 @@ from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME
 class GetSolarWindSpeedService:
 
     @staticmethod
-    @cache.memoize(timeout=900)
+    @cache.memoize(timeout=600)
     def get_solar_wind_speed():
         """
             Returns solar wind speed
