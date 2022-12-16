@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
 from flask import request
 
+from SWx_Dailly_View_Project import cache
 from SWx_Dailly_View_Project.s3_services import get_s3_client, BUCKET_NAME
 
 
 class GetSolarWindSpeedService:
 
     @staticmethod
+    @cache.memoize(timeout=900)
     def get_solar_wind_speed():
         """
             Returns solar wind speed
