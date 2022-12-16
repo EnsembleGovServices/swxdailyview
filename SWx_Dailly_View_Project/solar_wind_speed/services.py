@@ -26,7 +26,7 @@ class GetSolarWindSpeedService:
         # THIS IS FOR REFERENCE
         # print(f"This is date: {datetime_obj} and this is time: {time_range}"
         #       f"This is req_date: {req_date}"
-        #       f"This is req_date: {req_past}")
+        #       f"This is req_past: {req_past}")
 
         time = time_range[:2]
         time_files = []
@@ -36,31 +36,31 @@ class GetSolarWindSpeedService:
             req_date_lis.append(req_date)
 
         elif time == "01":
-            time_files.extend([1715, 1730, 1745, 1800])
+            time_files.extend(["1715", "1730", "1745", "1800"])
             req_date_lis.append(req_past)
 
         elif time == "02":
-            time_files.extend([1815, 1830, 1845, 1900])
+            time_files.extend(["1815", "1830", "1845", "1900"])
             req_date_lis.append(req_past)
 
         elif time == "03":
-            time_files.extend([1915, 1930, 1945, 2000])
+            time_files.extend(["1915", "1930", "1945", "2000"])
             req_date_lis.append(req_past)
 
         elif time == "04":
-            time_files.extend([2015, 2030, 2045, 2100])
+            time_files.extend(["2015", "2030", "2045", "2100"])
             req_date_lis.append(req_past)
 
         elif time == "05":
-            time_files.extend([2115, 2130, 2145, 2200])
+            time_files.extend(["2115", "2130", "2145", "2200"])
             req_date_lis.append(req_past)
 
         elif time == "06":
-            time_files.extend([2215, 2230, 2245, 2300])
+            time_files.extend(["2215", "2230", "2245", "2300"])
             req_date_lis.append(req_past)
 
         elif time == "07":
-            time_files.extend([2315, 2330, 2345, 0000])
+            time_files.extend(["2315", "2330", "2345", "0000"])
             req_date_lis.append(req_past)
 
         elif time == "08":
