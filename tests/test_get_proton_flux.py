@@ -32,7 +32,6 @@ def test_get_proton_flux_output_keys_in_seven_days(client):
     response = client.get('/get-proton-flux-data?days=7')
     res = response.data.decode()
     output = json.loads(res)
-    print("++++this is output:", output)
     assert "gt_10" in output.keys()
     assert "gt_50" in output.keys()
     assert "gt_100" in output.keys()

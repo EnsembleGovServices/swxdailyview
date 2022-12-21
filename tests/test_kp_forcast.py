@@ -11,10 +11,6 @@ def test_current_kp_index_status(client):
 def test_current_kp_index_with_time_stamp(client, time_stamp):
     response = client.get(f'/current-kp-index?time_stamp={time_stamp}')
     res = response.data.decode()
-    data = {
-        'kp_index': '0.67',
-        'noaa_scale': None
-    }
     output = json.loads(res)
-    assert data == output
+    assert "kp_index" in output.keys()
     assert response.status_code == 200
