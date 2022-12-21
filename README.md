@@ -63,6 +63,13 @@ This is the folder/file structure we have.
 │   │   ├── resources.py           ---------------> Api Endpoints
 │   │   ├── routes.py              ---------------> Api Endpoints
 │   │   ├── services.py            ---------------> Intermediate Layer( All other layer's communication must happen via this layer)
+│   │   └── utils.py   
+|   |
+│   └── /solar_wind_spee
+|   │   ├── __init__.py
+│   │   ├── resources.py           ---------------> Api Endpoints
+│   │   ├── routes.py              ---------------> Api Endpoints
+│   │   ├── services.py            ---------------> Intermediate Layer( All other layer's communication must happen via this layer)
 │   │   └── utils.py               ---------------> Common function which is used repeadately declared here
 |   
 ├── .env-example  or .env          ---------------> Required configuartion(Development, Production etc.) 
@@ -109,7 +116,10 @@ directory and the files like requirements.txt, .gitignore, .env, etc.
   
     * For bigger projects, all our code shouldn't be in the same file. Instead, we can segment or split bigger codes into separate files, mostly based on functionality. Like bricks forming a wall.
     * For This purpose here we are using blueprints.
-
+  
+    4. solar wind speed module
+    * it will returns the avg_bt value for particular hour data
+      
 
 # *Module level files*
 
@@ -301,3 +311,17 @@ GET /get-high-latitude
 
 ![ad](readme_file_images/latitude_index.png)
 - Here we have high and middle latitude's percentage wise outputs. 
+
+## Module #4 Solar Wind Speed module 
+- We have 1 endpoint regarding Solar wind speed related data
+
+```html
+GET /get-solar-wind-speed
+```
+
+| Parameter    | Type     | Description                                |
+|:-------------|:---------|:-------------------------------------------|
+| `time_stamp` | `string` | **Required**. Unix time (current location) |
+
+- Output response will gives the average bt value for particular hour.
+- example if provided time is 4.15 minutes then it will returns avg_bt of hour=4.[ 4.00 - 4.59 interval ]
